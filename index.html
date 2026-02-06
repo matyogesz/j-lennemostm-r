@@ -1,97 +1,206 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meghívó Editnek</title>
-    <style>
-        body { background-color: #fce4ec; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: 'Arial', sans-serif; }
-        .container { position: relative; text-align: center; }
-        .envelope-wrapper { position: relative; cursor: pointer; z-index: 2; }
-        .envelope { position: relative; width: 300px; height: 200px; background-color: #d32f2f; }
-        .front { position: absolute; width: 0; height: 0; border-right: 150px solid #f44336; border-left: 150px solid #f44336; border-top: 100px solid transparent; border-bottom: 100px solid #f44336; top: 0; left: 0; z-index: 10; }
-        .top { position: absolute; width: 0; height: 0; border-right: 150px solid transparent; border-left: 150px solid transparent; border-top: 105px solid #d32f2f; top: 0; left: 0; z-index: 11; transform-origin: top; transition: transform 0.4s ease; }
-        .letter { position: absolute; top: 10px; left: 10px; width: 280px; height: 180px; background: white; z-index: 5; transition: transform 0.6s ease; padding: 15px; box-sizing: border-box; border-radius: 5px; text-align: center; }
-        .envelope-wrapper.open .top { transform: rotateX(180deg); z-index: 1; }
-        .envelope-wrapper.open .letter { transform: translateY(-130px); height: 240px; z-index: 12; }
-        .text h2 { color: #d32f2f; margin: 0; font-size: 20px; }
-        .btns { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
-        button { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .yes-btn { background-color: #4caf50; color: white; }
-        .no-btn { background-color: #f44336; color: white; position: absolute; white-space: nowrap; z-index: 1000; }
-        .hidden { display: none; }
-        #success-message { color: #d32f2f; text-align: center; }
-        .heart-rain { position: fixed; font-size: 25px; pointer-events: none; z-index: 9999; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lennél a Valentinom? ❤️</title>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #2c003e, #0f0018);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+  color: white;
+  padding: 20px;
+}
+
+/* háttér szívek */
+.heart-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.heart-bg span {
+  position: absolute;
+  bottom: -20px;
+  animation: floatUp linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes floatUp {
+  from { transform: translateY(0); opacity: 0.6; }
+  to { transform: translateY(-120vh); opacity: 0; }
+}
+
+/* kártya */
+.card {
+  max-width: 420px;
+  width: 100%;
+  background: rgba(255,255,255,0.08);
+  border-radius: 22px;
+  padding: 28px 22px;
+  text-align: center;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.45);
+}
+
+.big-heart {
+  font-size: 3.2rem;
+  margin: 18px 0;
+  animation: pulse 2.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+h1 { font-size: 1.9rem; margin-bottom: 12px; }
+p { font-size: 1.05rem; line-height: 1.6; }
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 22px;
+  position: relative;
+}
+
+button {
+  padding: 12px 22px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.yes {
+  background: linear-gradient(135deg, #ff4d8d, #ff1f6f);
+  color: white;
+}
+
+.no {
+  background: #444;
+  color: white;
+  position: relative;
+  transition: transform 0.45s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* beszólás */
+.comment {
+  margin-top: 16px;
+  font-size: 1rem;
+  min-height: 1.4em;
+  opacity: 0.9;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 0.9; transform: translateY(0); }
+}
+
+.hidden { display: none; }
+
+.details {
+  margin-top: 18px;
+  line-height: 1.6;
+}
+</style>
 </head>
+
 <body>
 
-<div class="container" id="main-container">
-    <div class="envelope-wrapper" id="envelope">
-        <div class="envelope">
-            <div class="letter">
-                <div class="text">
-                    <h2>Drága Edit! ❤️</h2>
-                    <p>Lennél a Valentinom?</p>
-                    <div class="btns">
-                        <button class="yes-btn" onclick="sayYes()">IGEN</button>
-                        <button class="no-btn" id="noBtn">NEM</button>
-                    </div>
-                </div>
-            </div>
-            <div class="front"></div>
-            <div class="top"></div>
-        </div>
-    </div>
-</div>
+<div class="heart-bg" id="bg"></div>
 
-<div id="success-message" class="hidden">
-    <h1 style="font-size: 3rem;">Tudtam! 🥰</h1>
-    <p style="font-size: 1.5rem;">Szuper lesz, Edit!</p>
-    <p>📍 Rózsás Csárda | 📅 Február 14. 19:00</p>
-    <div style="font-size: 5rem;">🍷✨🍝</div>
+<div class="card">
+  <div id="question">
+    <div class="big-heart">❤️</div>
+    <h1>Lennél a Valentinom?</h1>
+    <p>
+      Tudod, hogy igen lesz.<br>
+      Csak még játszol kicsit 😏
+    </p>
+
+    <div class="buttons">
+      <button class="yes" onclick="accept()">IGEN</button>
+      <button class="no" id="noBtn" onmouseover="escapeNo()">NEM</button>
+    </div>
+
+    <div class="comment" id="comment"></div>
+  </div>
+
+  <div id="answer" class="hidden">
+    <div class="big-heart">💖</div>
+    <h1>Na ugye 😌</h1>
+    <div class="details">
+      📅 2026. február 14.<br>
+      ⏰ 19:00<br>
+      📍 Rózsás Csárda<br><br>
+      Most már nincs menekvés ❤️
+    </div>
+  </div>
 </div>
 
 <script>
-    const envelope = document.getElementById('envelope');
-    const noBtn = document.getElementById('noBtn');
-    const phrases = ["Ezt nem gondolhatod komolyan! 😂", "Rossz gomb, próbáld a másikat! 👈", "Bakker, majdnem eltaláltál! 🏃‍♂️", "Edit, ne szórakozz velem! 😜", "Esélyed sincs! 🙅‍♀️", "Inkább menjünk vacsizni! 🥂"];
-    let phraseIndex = 0;
+/* háttér szívek */
+const bg = document.getElementById("bg");
+for (let i = 0; i < 18; i++) {
+  const s = document.createElement("span");
+  s.innerHTML = "❤️";
+  s.style.left = Math.random() * 100 + "vw";
+  s.style.animationDuration = (8 + Math.random() * 6) + "s";
+  s.style.fontSize = (14 + Math.random() * 22) + "px";
+  bg.appendChild(s);
+}
 
-    envelope.addEventListener('click', function(e) {
-        if (e.target.tagName !== 'BUTTON') { this.classList.toggle('open'); }
-    });
+/* flörtös beszólások */
+const texts = [
+  "Ez most komoly? 😈",
+  "Ne hazudj magadnak 😏",
+  "Ez túl közel volt… 🔥",
+  "Ujjacskák félre 😉",
+  "Majd később megbeszéljük 😌",
+  "Próbálkozol, de minek 😘",
+  "Ez a gomb csak dísz 😇",
+  "Csak az IGEN működik 😎"
+];
 
-    noBtn.addEventListener('mouseover', () => {
-        const x = Math.random() * (window.innerWidth - 150);
-        const y = Math.random() * (window.innerHeight - 50);
-        noBtn.style.position = 'fixed';
-        noBtn.style.left = x + 'px';
-        noBtn.style.top = y + 'px';
-        noBtn.innerHTML = phrases[phraseIndex];
-        phraseIndex = (phraseIndex + 1) % phrases.length;
-    });
+let last = -1;
 
-    function sayYes() {
-        document.getElementById('main-container').classList.add('hidden');
-        document.getElementById('success-message').classList.remove('hidden');
-        setInterval(createHeart, 200);
-    }
+/* nagyobb ugrás + spring */
+function escapeNo() {
+  const btn = document.getElementById("noBtn");
+  const comment = document.getElementById("comment");
 
-    function createHeart() {
-        const heart = document.createElement('div');
-        heart.className = 'heart-rain';
-        heart.innerHTML = ['❤️', '💖', '💝'][Math.floor(Math.random() * 3)];
-        heart.style.left = Math.random() * 100 + 'vw';
-        heart.style.top = '-50px';
-        heart.style.transition = 'transform 3s linear, opacity 3s';
-        document.body.appendChild(heart);
-        setTimeout(() => {
-            heart.style.transform = `translateY(110vh) rotate(${Math.random() * 360}deg)`;
-            heart.style.opacity = '0';
-        }, 100);
-        setTimeout(() => heart.remove(), 3000);
-    }
+  const x = Math.random() * 240 - 120;
+  const y = Math.random() * 160 - 80;
+  btn.style.transform = `translate(${x}px, ${y}px) rotate(${Math.random()*10-5}deg)`;
+
+  let i;
+  do {
+    i = Math.floor(Math.random() * texts.length);
+  } while (i === last);
+  last = i;
+
+  comment.textContent = texts[i];
+}
+
+/* igen */
+function accept() {
+  document.getElementById("question").classList.add("hidden");
+  document.getElementById("answer").classList.remove("hidden");
+}
 </script>
+
 </body>
 </html>
